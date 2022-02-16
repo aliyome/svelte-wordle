@@ -323,6 +323,8 @@
 			<div class="flex items-center mt-2">
 				{#each row as key}
 					<button
+						on:click={() => handleClickKey(key)}
+						type="button"
 						class="flex items-center justify-center min-w-[42px] h-[58px] mr-2 bg-gray-300 rounded font-bold"
 						class:px-2={['Enter', 'Backspace'].includes(key)}
 						class:text-xs={['Enter', 'Backspace'].includes(key)}
@@ -347,6 +349,8 @@
 	>
 		{infoMessage}
 	</div>
+
+	<!-- dialog for share result -->
 </div>
 
 <style>
