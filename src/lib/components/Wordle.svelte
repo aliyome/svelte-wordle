@@ -7,7 +7,7 @@
 	// Maximum length of the word
 	const WORD_LENGTH = 5;
 	// Maximum numbers of tries
-	const NUM_TRIES = 6;
+	const NUM_TRIES = 2;
 
 	// Letter map[a-z]
 	const LETTERS = (() => {
@@ -126,6 +126,9 @@
 	// When the isShownMessageSnackbar becomes false, the fade-out transition will be played,
 	// and we want to keep the infoMessage intact while it plays.
 	let isShownMessageSnackbar = false;
+
+	// Controls the display of the share dialog
+	let isShowShareDialog = false;
 
 	function handleKeydownEvent(e: KeyboardEvent) {
 		handleClickKey(e.key);
@@ -253,14 +256,14 @@
 				await sleep(160);
 			}
 
-			// TODO: Display share dialog
+			showShare();
 			return;
 		}
 
 		// Running out of tries. Show correct answer.
 		if (wordle.numSubmittedTries >= NUM_TRIES) {
 			showInfoMessage(wordle.targetWord.toUpperCase(), false);
-			// TODO: show share?
+			showShare();
 		}
 	}
 
@@ -284,6 +287,11 @@
 		isShownMessageSnackbar = false;
 		await sleep(500);
 		infoMessage = '';
+	}
+
+	async function showShare() {
+		await sleep(1500);
+		isShowShareDialog = true;
 	}
 </script>
 
@@ -351,6 +359,21 @@
 	</div>
 
 	<!-- dialog for share result -->
+	<div
+		class="absolute w-full h-full bg-white/50 flex items-center justify-center transition-opacity duration-100"
+		class:opacity-0={!isShowShareDialog}
+		class:opacity-1={isShowShareDialog}
+	>
+		<div
+			class="w-[300px] h-[300px] bg-white flex items-center justify-center rounded border shadow-xl transition-all duration-300"
+			class:opacity-0={!isShowShareDialog}
+			class:opacity-1={isShowShareDialog}
+			class:translate-y-10={!isShowShareDialog}
+			class:translate-y-0={isShowShareDialog}
+		>
+			<button class="bg-green-500 text-white font-bold px-4 py-2 rounded"> Share </button>
+		</div>
+	</div>
 </div>
 
 <style>
