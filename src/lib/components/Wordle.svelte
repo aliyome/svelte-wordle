@@ -1,4 +1,7 @@
 <script lang="ts">
+	// Util
+	const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 	// Maximum length of the word
 	const WORD_LENGTH = 5;
 	// Maximum numbers of tries
@@ -62,6 +65,15 @@
 	}
 	const wordle = createWordle();
 
+	// Message shown in the message snackbar.
+	let infoMessage = '';
+	// Controls the display of the snackbar.
+	// The reason why we have separate infoMessage and isShownMessageSnackbar is
+	// because we want to clear the infoMessage after a while after the isShownMessageSnackbar is set to false.
+	// When the isShownMessageSnackbar becomes false, the fade-out transition will be played,
+	// and we want to keep the infoMessage intact while it plays.
+	let isShownMessageSnackbar = false;
+
 	function handleKeydownEvent(e: KeyboardEvent) {
 		handleClickKey(e.key);
 	}
@@ -84,15 +96,40 @@
 			wordle.currentLetterIndex = Math.max(--wordle.currentLetterIndex, 0);
 			setLetter('');
 		}
+		// Submit the current try and check.
+		else if (key === 'Enter') {
+			checkCurrentTry();
+		}
 	}
 
 	function setLetter(letter: string) {
 		wordle.tries[wordle.currentTryIndex].letters[wordle.currentLetterIndex].text = letter;
 	}
+
+	function checkCurrentTry() {
+		// Check if user has typed all letters.
+		const tr = wordle.tries[wordle.currentTryIndex];
+		if (tr.letters.some((letter) => letter.text === '')) {
+			showInfoMessage('not enough letters');
+			return;
+		}
+	}
+
+	async function showInfoMessage(msg: string) {
+		isShownMessageSnackbar = true;
+		infoMessage = msg;
+		// Hide after 2s.
+		await sleep(2000);
+		// When isShownMessageSnackbar is false, the fadeout transition will be played.
+		// Remain info message between fade out transition.
+		isShownMessageSnackbar = false;
+		await sleep(500);
+		infoMessage = '';
+	}
 </script>
 
 <svelte:window on:keydown={handleKeydownEvent} />
-<div class="w-full h-full flex flex-col items-center">
+<div class="relative w-full h-full flex flex-col items-center">
 	<div
 		class="flex items-center justify-center font-bold text-4xl w-full h-[54px] border-b border-b-gray-300"
 	>
@@ -116,6 +153,15 @@
 		</div>
 	</div>
 	<div class="mb-2">Keyboard</div>
+
+	<!-- snackbar for info message -->
+	<div
+		class="absolute top-24 px-6 py-4 bg-black text-white rounded-lg font-bold transition-opacity duration-500"
+		class:opacity-0={!isShownMessageSnackbar}
+		class:opacity-1={isShownMessageSnackbar}
+	>
+		{infoMessage}
+	</div>
 </div>
 
 <style>
