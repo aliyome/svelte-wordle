@@ -37,6 +37,8 @@
 		// Stores all tries.
 		// One try is one row in the UI.
 		readonly tries: Try[];
+		// Tracks the number of submitted tries.
+		numSubmittedTries: number;
 		// Tracks the current try index.
 		currentTryIndex: number;
 		// Tracks the current letter index.
@@ -55,6 +57,7 @@
 
 		return {
 			tries,
+			numSubmittedTries: 0,
 			currentTryIndex: 0,
 			currentLetterIndex: 0
 		};
@@ -69,10 +72,13 @@
 		if (LETTERS[key.toLowerCase()]) {
 			setLetter(key.toLowerCase());
 			wordle.currentLetterIndex++;
+			// Only allow typing letters in the current try.
+			// Don't go over if the current try has not been submitted.
 			if (wordle.currentLetterIndex >= WORD_LENGTH) {
-				// TODO: Need to reimplement this. Automaticaly move to the next try for now.
-				wordle.currentLetterIndex = 0;
-				wordle.currentTryIndex++;
+				if (wordle.currentTryIndex < wordle.numSubmittedTries) {
+					wordle.currentLetterIndex = 0;
+					wordle.currentTryIndex++;
+				}
 			}
 		}
 	}
