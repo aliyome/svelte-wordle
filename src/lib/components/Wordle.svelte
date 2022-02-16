@@ -25,6 +25,7 @@
 	interface Letter {
 		text: string;
 		state: LetterState;
+		flipping: boolean;
 	}
 	const enum LetterState {
 		// you know.
@@ -62,7 +63,7 @@
 		for (let i = 0; i < NUM_TRIES; i++) {
 			const letters: Letter[] = [];
 			for (let j = 0; j < WORD_LENGTH; j++) {
-				letters.push({ text: '', state: LetterState.PENDING });
+				letters.push({ text: '', state: LetterState.PENDING, flipping: false });
 			}
 			tries.push({ letters, shaking: false });
 		}
@@ -181,7 +182,19 @@
 			}
 			states.push(state);
 		}
-		console.log(states);
+
+		// Animate
+		for (let i = 0; i < tr.letters.length; i++) {
+			// "Flip" the letter, apply the result (and update the style), then unflip it.
+			wordle.tries[wordle.currentTryIndex].letters[i].flipping = true;
+			// Wait for the flip animation to finish.
+			await sleep(180);
+			// Update state. This will also update styles.
+			wordle.tries[wordle.currentTryIndex].letters[i].state = states[i];
+			// Unfold
+			wordle.tries[wordle.currentTryIndex].letters[i].flipping = false;
+			await sleep(180);
+		}
 	}
 
 	async function shakeCurrentRow() {
@@ -216,9 +229,15 @@
 				<div class="flex gap-1 mb-1" class:shake-anim={tr.shaking}>
 					{#each tr.letters as letter}
 						<div
-							class="flex items-center justify-center w-[64px] h-[64px] text-[32px] font-bold uppercase border-2 box-border border-gray-300"
+							class="flex items-center justify-center w-[64px] h-[64px] text-[32px] font-bold uppercase border-2 box-border border-gray-300 transition-transform duration-[180ms]"
 							class:border-gray-600={letter.text !== ''}
 							class:letter-pop-anim={letter.text !== ''}
+							class:letter-flip-anim={letter.flipping}
+							class:bg-green-600={letter.state === LetterState.FULL_MATCH}
+							class:bg-orange-600={letter.state === LetterState.PARTIAL_MATCH}
+							class:bg-gray-600={letter.state === LetterState.WRONG}
+							class:text-gray-100={letter.state !== LetterState.PENDING}
+							class:scale-y-0={letter.flipping}
 						>
 							{letter.text}
 						</div>
@@ -278,8 +297,10 @@
 			transform: translateX(4px);
 		}
 	}
-
 	.shake-anim {
 		animation: shake 500ms ease-in-out;
+	}
+
+	.flip-anim {
 	}
 </style>
