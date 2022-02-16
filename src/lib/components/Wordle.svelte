@@ -112,15 +112,18 @@
 	function handleClickKey(key: string) {
 		// If key is a letter, update text in the corresponding letter object.
 		if (LETTERS[key.toLowerCase()]) {
-			setLetter(key.toLowerCase());
-			wordle.currentLetterIndex++;
 			// Only allow typing letters in the current try.
 			// Don't go over if the current try has not been submitted.
 			if (wordle.currentLetterIndex >= WORD_LENGTH) {
 				if (wordle.currentTryIndex < wordle.numSubmittedTries) {
 					wordle.currentLetterIndex = 0;
 					wordle.currentTryIndex++;
+					setLetter(key.toLowerCase());
+					wordle.currentLetterIndex++;
 				}
+			} else {
+				setLetter(key.toLowerCase());
+				wordle.currentLetterIndex++;
 			}
 		}
 		// Handle backspace
@@ -155,9 +158,7 @@
 			return;
 		}
 
-		// // Check if the current try matches the target word.
-		// if (wordOnCurrentTry !== wordle.targetWord) {
-		// }
+		// Check if the current try matches the target word.
 
 		// Store the check results
 		const states: LetterState[] = [];
@@ -195,6 +196,9 @@
 			wordle.tries[wordle.currentTryIndex].letters[i].flipping = false;
 			await sleep(180);
 		}
+
+		// Move to next try
+		wordle.numSubmittedTries++;
 	}
 
 	async function shakeCurrentRow() {
