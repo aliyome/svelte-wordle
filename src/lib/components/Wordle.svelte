@@ -260,7 +260,7 @@
 	>
 		My Wordle
 	</div>
-	<div class="flex-1 mt-2">
+	<div class="flex-1 mt-2 flex flex-col justify-center">
 		<div>
 			{#each wordle.tries as tr}
 				<div class="flex gap-1 mb-1" class:shake-anim={tr.shaking}>
