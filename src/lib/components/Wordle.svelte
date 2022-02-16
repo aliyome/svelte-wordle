@@ -39,6 +39,13 @@
 		PENDING
 	}
 
+	// Keyboard rows
+	const KEYBOARD_ROWS = [
+		['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+		['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+		['Enter', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Backspace']
+	];
+
 	interface Wordle {
 		// Stores all tries.
 		// One try is one row in the UI.
@@ -284,7 +291,19 @@
 			{/each}
 		</div>
 	</div>
-	<div class="mb-2">Keyboard</div>
+	<div class="mb-2 flex flex-col items-center">
+		{#each KEYBOARD_ROWS as row}
+			<div class="flex items-center mt-2">
+				{#each row as key}
+					<button
+						class="flex items-center justify-center min-w-[42px] h-[58px] mr-2 bg-gray-300 rounded font-bold"
+						class:px-2={['Enter', 'Backspace'].includes(key)}
+						class:text-xs={['Enter', 'Backspace'].includes(key)}>{key}</button
+					>
+				{/each}
+			</div>
+		{/each}
+	</div>
 
 	<!-- snackbar for info message -->
 	<div
