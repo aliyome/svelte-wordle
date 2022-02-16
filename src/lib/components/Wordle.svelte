@@ -26,6 +26,7 @@
 		text: string;
 		state: LetterState;
 		flipping: boolean;
+		bouncing: boolean;
 	}
 	const enum LetterState {
 		// you know.
@@ -55,6 +56,8 @@
 		currentTryIndex: number;
 		// Tracks the current letter index.
 		currentLetterIndex: number;
+		// Won or not.
+		won: boolean;
 	}
 
 	function createWordle(): Wordle {
@@ -63,7 +66,7 @@
 		for (let i = 0; i < NUM_TRIES; i++) {
 			const letters: Letter[] = [];
 			for (let j = 0; j < WORD_LENGTH; j++) {
-				letters.push({ text: '', state: LetterState.PENDING, flipping: false });
+				letters.push({ text: '', state: LetterState.PENDING, flipping: false, bouncing: false });
 			}
 			tries.push({ letters, shaking: false });
 		}
@@ -92,7 +95,8 @@
 			targetWordLetterCounts,
 			numSubmittedTries: 0,
 			currentTryIndex: 0,
-			currentLetterIndex: 0
+			currentLetterIndex: 0,
+			won: false
 		};
 	}
 	const wordle = createWordle();
@@ -110,6 +114,11 @@
 		handleClickKey(e.key);
 	}
 	function handleClickKey(key: string) {
+		// Don't process key down when user has won the game.
+		if (wordle.won) {
+			return;
+		}
+
 		// If key is a letter, update text in the corresponding letter object.
 		if (LETTERS[key.toLowerCase()]) {
 			// Only allow typing letters in the current try.
@@ -199,6 +208,20 @@
 
 		// Move to next try
 		wordle.numSubmittedTries++;
+
+		// Check if all letters in the current try are correct.
+		if (states.every((state) => state === LetterState.FULL_MATCH)) {
+			showInfoMessage('You did it!');
+			wordle.won = true;
+			// Bounce animation
+			for (let i = 0; i < tr.letters.length; i++) {
+				wordle.tries[wordle.currentTryIndex].letters[i].bouncing = true;
+				await sleep(160);
+			}
+
+			// TODO: Display share dialog
+			return;
+		}
 	}
 
 	async function shakeCurrentRow() {
@@ -237,6 +260,7 @@
 							class:border-gray-600={letter.text !== ''}
 							class:letter-pop-anim={letter.text !== ''}
 							class:letter-flip-anim={letter.flipping}
+							class:bouncing-anim={letter.bouncing}
 							class:bg-green-600={letter.state === LetterState.FULL_MATCH}
 							class:bg-orange-600={letter.state === LetterState.PARTIAL_MATCH}
 							class:bg-gray-600={letter.state === LetterState.WRONG}
@@ -305,6 +329,30 @@
 		animation: shake 500ms ease-in-out;
 	}
 
-	.flip-anim {
+	/* Again, got this from wordle css:) */
+	@keyframes bounce {
+		0%,
+		20% {
+			transform: translateY(0);
+		}
+		40% {
+			transform: translateY(-30px);
+		}
+		50% {
+			transform: translateY(5px);
+		}
+		60% {
+			transform: translateY(-15px);
+		}
+		80% {
+			transform: translateY(2px);
+		}
+		100% {
+			transform: translateY(0);
+		}
+	}
+
+	.bouncing-anim {
+		animation: bounce 1s ease-in-out;
 	}
 </style>
