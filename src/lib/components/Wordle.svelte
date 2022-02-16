@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { tick } from 'svelte';
-
 	import { words as WORDS } from './words';
 
 	// Util
@@ -45,6 +43,11 @@
 		readonly tries: Try[];
 		// Store the target word
 		readonly targetWord: string;
+		// Store the count for each letter from the target word.
+		//
+		// For example, if the target word is "happy", then this record will look like:
+		// { h:1, a:1, p:2, y:1 }
+		readonly targetWordLetterCounts: Record<string, number>;
 		// Tracks the number of submitted tries.
 		numSubmittedTries: number;
 		// Tracks the current try index.
@@ -65,14 +68,27 @@
 		}
 
 		// Get a target word from the word list.
-		const targetWord = WORDS[Math.floor(Math.random() * WORDS.length)].toLowerCase();
+		// const targetWord = WORDS[Math.floor(Math.random() * WORDS.length)].toLowerCase();
+		// TODO: Remove this.
+		const targetWord = 'happy';
 
 		// TODO: Remove this cheat log
 		console.log('target word: ', targetWord);
 
+		// Generate letter counts for target word.
+		const targetWordLetterCounts: Record<string, number> = {};
+		for (const letter of targetWord) {
+			if (!targetWordLetterCounts[letter]) {
+				targetWordLetterCounts[letter] = 1;
+			} else {
+				targetWordLetterCounts[letter]++;
+			}
+		}
+
 		return {
 			tries,
 			targetWord,
+			targetWordLetterCounts,
 			numSubmittedTries: 0,
 			currentTryIndex: 0,
 			currentLetterIndex: 0
@@ -137,6 +153,35 @@
 			await shakeCurrentRow();
 			return;
 		}
+
+		// // Check if the current try matches the target word.
+		// if (wordOnCurrentTry !== wordle.targetWord) {
+		// }
+
+		// Store the check results
+		const states: LetterState[] = [];
+		// Clone the count map. Need to use it in every check with the initial values.
+		const targetWordLetterCounts = { ...wordle.targetWordLetterCounts };
+		for (let i = 0; i < WORD_LENGTH; i++) {
+			const expected = wordle.targetWord[i];
+			const currentLetter = tr.letters[i];
+			const actual = currentLetter.text.toLowerCase();
+			let state = LetterState.WRONG;
+			// Need to make sure only performs the check when the letter has not been checked before.
+			//
+			// For example, if the target word is "happy",
+			// then the first "a" user types should be checked, but the second "a" should not,
+			// because there is no more "a" left in the target word that has not not been checked.
+			if (expected === actual && targetWordLetterCounts[actual] > 0) {
+				targetWordLetterCounts[actual]--;
+				state = LetterState.FULL_MATCH;
+			} else if (wordle.targetWord.includes(actual) && targetWordLetterCounts[actual] > 0) {
+				targetWordLetterCounts[actual]--;
+				state = LetterState.PARTIAL_MATCH;
+			}
+			states.push(state);
+		}
+		console.log(states);
 	}
 
 	async function shakeCurrentRow() {
