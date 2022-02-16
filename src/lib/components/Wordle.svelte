@@ -81,6 +81,11 @@
 				}
 			}
 		}
+		// Handle backspace
+		else if (key === 'Backspace') {
+			wordle.currentLetterIndex = Math.max(--wordle.currentLetterIndex, 0);
+			setLetter('');
+		}
 	}
 
 	function setLetter(letter: string) {
