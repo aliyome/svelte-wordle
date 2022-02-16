@@ -7,7 +7,7 @@
 	// Maximum length of the word
 	const WORD_LENGTH = 5;
 	// Maximum numbers of tries
-	const NUM_TRIES = 2;
+	const NUM_TRIES = 6;
 
 	// Letter map[a-z]
 	const LETTERS = (() => {
@@ -293,6 +293,33 @@
 		await sleep(1500);
 		isShowShareDialog = true;
 	}
+
+	function handleClickShare() {
+		// 🟩 🟨 ⬛ ⬜
+		// Copy results into clipboard
+		let clipboardContent = '';
+		for (const tr of wordle.tries) {
+			for (const letter of tr.letters) {
+				switch (letter.state) {
+					case LetterState.FULL_MATCH:
+						clipboardContent += '🟩';
+						break;
+					case LetterState.PARTIAL_MATCH:
+						clipboardContent += '🟨';
+						break;
+					case LetterState.WRONG:
+						clipboardContent += '⬛';
+						break;
+					default:
+						break;
+				}
+			}
+			clipboardContent += '\n';
+		}
+		navigator.clipboard.writeText(clipboardContent);
+		isShowShareDialog = false;
+		showInfoMessage('Copied result to clipboard');
+	}
 </script>
 
 <svelte:window on:keydown={handleKeydownEvent} />
@@ -371,7 +398,12 @@
 			class:translate-y-10={!isShowShareDialog}
 			class:translate-y-0={isShowShareDialog}
 		>
-			<button class="bg-green-500 text-white font-bold px-4 py-2 rounded"> Share </button>
+			<button
+				class="bg-green-500 text-white font-bold px-4 py-2 rounded"
+				on:click={handleClickShare}
+			>
+				Share
+			</button>
 		</div>
 	</div>
 </div>
