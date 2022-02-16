@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { tick } from 'svelte';
+
 	import { words as WORDS } from './words';
 
 	// Util
@@ -20,6 +22,7 @@
 
 	interface Try {
 		letters: Letter[];
+		shaking: boolean;
 	}
 	interface Letter {
 		text: string;
@@ -58,7 +61,7 @@
 			for (let j = 0; j < WORD_LENGTH; j++) {
 				letters.push({ text: '', state: LetterState.PENDING });
 			}
-			tries.push({ letters });
+			tries.push({ letters, shaking: false });
 		}
 
 		// Get a target word from the word list.
@@ -118,11 +121,12 @@
 		wordle.tries[wordle.currentTryIndex].letters[wordle.currentLetterIndex].text = letter;
 	}
 
-	function checkCurrentTry() {
+	async function checkCurrentTry() {
 		// Check if user has typed all letters.
 		const tr = wordle.tries[wordle.currentTryIndex];
 		if (tr.letters.some((letter) => letter.text === '')) {
 			showInfoMessage('Not enough letters');
+			await shakeCurrentRow();
 			return;
 		}
 
@@ -130,8 +134,15 @@
 		const wordOnCurrentTry = tr.letters.map((letter) => letter.text).join('');
 		if (!WORDS.includes(wordOnCurrentTry)) {
 			showInfoMessage('Not in word list');
+			await shakeCurrentRow();
 			return;
 		}
+	}
+
+	async function shakeCurrentRow() {
+		wordle.tries[wordle.currentTryIndex].shaking = true;
+		await sleep(500);
+		wordle.tries[wordle.currentTryIndex].shaking = false;
 	}
 
 	async function showInfoMessage(msg: string) {
@@ -157,7 +168,7 @@
 	<div class="flex-1 mt-2">
 		<div>
 			{#each wordle.tries as tr}
-				<div class="flex gap-1 mb-1">
+				<div class="flex gap-1 mb-1" class:shake-anim={tr.shaking}>
 					{#each tr.letters as letter}
 						<div
 							class="flex items-center justify-center w-[64px] h-[64px] text-[32px] font-bold uppercase border-2 box-border border-gray-300"
@@ -197,5 +208,33 @@
 	}
 	.letter-pop-anim {
 		animation: letter-pop 120ms ease-in-out;
+	}
+
+	/* Stole from wordle css. */
+	@keyframes shake {
+		10%,
+		90% {
+			transform: translateX(-1px);
+		}
+
+		20%,
+		80% {
+			transform: translateX(2px);
+		}
+
+		30%,
+		50%,
+		70% {
+			transform: translateX(-4px);
+		}
+
+		40%,
+		60% {
+			transform: translateX(4px);
+		}
+	}
+
+	.shake-anim {
+		animation: shake 500ms ease-in-out;
 	}
 </style>
