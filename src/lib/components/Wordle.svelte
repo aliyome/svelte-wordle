@@ -349,13 +349,13 @@
 	</div>
 	<div class="mb-2 flex flex-col items-center">
 		{#each KEYBOARD_ROWS as row}
-			<div class="flex items-center mt-2">
+			<div class="flex items-center mt-2 gap-1">
 				{#each row as key}
 					<button
 						on:click={() => handleClickKey(key)}
 						type="button"
-						class="flex items-center justify-center min-w-[42px] h-[58px] mr-2 bg-gray-300 rounded font-bold"
-						class:px-2={['Enter', 'Backspace'].includes(key)}
+						class="flex items-center justify-center min-w-[30px] h-[58px] bg-gray-300 rounded font-bold"
+						class:px-1={['Enter', 'Backspace'].includes(key)}
 						class:text-xs={['Enter', 'Backspace'].includes(key)}
 						class:!bg-green-600={wordle.currentLetterStates[key.toLowerCase()] ===
 							LetterState.FULL_MATCH}
