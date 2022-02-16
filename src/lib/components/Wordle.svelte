@@ -347,7 +347,7 @@
 			{/each}
 		</div>
 	</div>
-	<div class="mb-2 flex flex-col items-center">
+	<div class="mb-4 flex flex-col items-center">
 		{#each KEYBOARD_ROWS as row}
 			<div class="flex items-center mt-2 gap-1">
 				{#each row as key}
