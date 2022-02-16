@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { each } from 'svelte/internal';
-
 	// Maximum length of the word
 	const WORD_LENGTH = 5;
 	// Maximum numbers of tries
