@@ -372,19 +372,16 @@
 
 	<!-- snackbar for info message -->
 	<div
-		class="absolute top-24 px-6 py-4 bg-black text-white rounded-lg font-bold transition-opacity duration-500"
-		class:opacity-0={!isShownMessageSnackbar}
-		class:opacity-1={isShownMessageSnackbar}
+		class="absolute top-24 px-6 py-4 bg-black text-white rounded-lg font-bold transition-opacity duration-500 opacity-0"
+		class:!opacity-1={isShownMessageSnackbar}
 	>
 		{infoMessage}
 	</div>
 
 	<!-- dialog for share result -->
 	<div
-		class="absolute w-full h-full bg-white/50 flex items-center justify-center transition-opacity duration-100"
-		class:opacity-0={!isShowShareDialog}
+		class="absolute w-full h-full bg-white/50 flex items-center justify-center transition-opacity duration-100 opacity-0 invisible"
 		class:opacity-1={isShowShareDialog}
-		class:invisible={!isShowShareDialog}
 		class:visible={isShowShareDialog}
 	>
 		<div
