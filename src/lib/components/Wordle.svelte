@@ -29,14 +29,14 @@
 		bouncing: boolean;
 	}
 	const enum LetterState {
+		// before the current try is submitted.
+		PENDING,
 		// you know.
 		WRONG,
 		// letter in word but position is wrong.
 		PARTIAL_MATCH,
 		// letter and position are all correct.
-		FULL_MATCH,
-		// before the current try is submitted.
-		PENDING
+		FULL_MATCH
 	}
 
 	// Keyboard rows
@@ -57,6 +57,8 @@
 		// For example, if the target word is "happy", then this record will look like:
 		// { h:1, a:1, p:2, y:1 }
 		readonly targetWordLetterCounts: Record<string, number>;
+		// Stores the state for the keyboard key indexed by keys.
+		readonly currentLetterStates: Record<string, LetterState>;
 		// Tracks the number of submitted tries.
 		numSubmittedTries: number;
 		// Tracks the current try index.
@@ -96,10 +98,18 @@
 			}
 		}
 
+		// Generate initial letter states.
+		const currentLetterStates: Record<string, LetterState> = {};
+		for (const letter of KEYBOARD_ROWS.flat().map((x) => x.toLowerCase())) {
+			currentLetterStates[letter] = LetterState.PENDING;
+		}
+		console.log(currentLetterStates);
+
 		return {
 			tries,
 			targetWord,
 			targetWordLetterCounts,
+			currentLetterStates,
 			numSubmittedTries: 0,
 			currentTryIndex: 0,
 			currentLetterIndex: 0,
@@ -213,6 +223,23 @@
 			await sleep(180);
 		}
 
+		// Store to keyboard keys states.
+		// Do this after the current try has been submitted
+		// and the animation above is done.
+		for (const letter of tr.letters) {
+			const actual = letter.text.toLowerCase();
+			const currentStoredState = wordle.currentLetterStates[actual];
+			const targetStoredState = letter.state;
+			// This allows override state with better result.
+			// For example, if "A" was partial match in previous try,
+			// and becomes full match in the current try,
+			// we update the key state to the full match
+			// (because its enum value is larger).
+			if (targetStoredState > currentStoredState) {
+				wordle.currentLetterStates[actual] = targetStoredState;
+			}
+		}
+
 		// Move to next try
 		wordle.numSubmittedTries++;
 
@@ -298,7 +325,14 @@
 					<button
 						class="flex items-center justify-center min-w-[42px] h-[58px] mr-2 bg-gray-300 rounded font-bold"
 						class:px-2={['Enter', 'Backspace'].includes(key)}
-						class:text-xs={['Enter', 'Backspace'].includes(key)}>{key}</button
+						class:text-xs={['Enter', 'Backspace'].includes(key)}
+						class:!bg-green-600={wordle.currentLetterStates[key.toLowerCase()] ===
+							LetterState.FULL_MATCH}
+						class:!bg-orange-600={wordle.currentLetterStates[key.toLowerCase()] ===
+							LetterState.PARTIAL_MATCH}
+						class:!bg-gray-600={wordle.currentLetterStates[key.toLowerCase()] === LetterState.WRONG}
+						class:!text-gray-100={wordle.currentLetterStates[key.toLowerCase()] !==
+							LetterState.PENDING}>{key}</button
 					>
 				{/each}
 			</div>
