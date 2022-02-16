@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { words } from './words';
+	import { words as WORDS } from './words';
 
 	// Util
 	const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -62,7 +62,7 @@
 		}
 
 		// Get a target word from the word list.
-		const targetWord = words[Math.floor(Math.random() * words.length)].toLowerCase();
+		const targetWord = WORDS[Math.floor(Math.random() * WORDS.length)].toLowerCase();
 
 		// TODO: Remove this cheat log
 		console.log('target word: ', targetWord);
@@ -122,7 +122,14 @@
 		// Check if user has typed all letters.
 		const tr = wordle.tries[wordle.currentTryIndex];
 		if (tr.letters.some((letter) => letter.text === '')) {
-			showInfoMessage('not enough letters');
+			showInfoMessage('Not enough letters');
+			return;
+		}
+
+		// Check if the current try is a word in the list.
+		const wordOnCurrentTry = tr.letters.map((letter) => letter.text).join('');
+		if (!WORDS.includes(wordOnCurrentTry)) {
+			showInfoMessage('Not in word list');
 			return;
 		}
 	}
