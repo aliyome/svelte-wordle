@@ -81,12 +81,7 @@
 		}
 
 		// Get a target word from the word list.
-		// const targetWord = WORDS[Math.floor(Math.random() * WORDS.length)].toLowerCase();
-		// TODO: Remove this.
-		const targetWord = 'happy';
-
-		// TODO: Remove this cheat log
-		console.log('target word: ', targetWord);
+		const targetWord = WORDS[Math.floor(Math.random() * WORDS.length)].toLowerCase();
 
 		// Generate letter counts for target word.
 		const targetWordLetterCounts: Record<string, number> = {};
@@ -103,7 +98,6 @@
 		for (const letter of KEYBOARD_ROWS.flat().map((x) => x.toLowerCase())) {
 			currentLetterStates[letter] = LetterState.PENDING;
 		}
-		console.log(currentLetterStates);
 
 		return {
 			tries,
