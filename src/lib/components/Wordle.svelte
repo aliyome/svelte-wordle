@@ -105,6 +105,7 @@
 					{#each tr.letters as letter}
 						<div
 							class="flex items-center justify-center w-[64px] h-[64px] text-[32px] font-bold uppercase border-2 box-border border-gray-300"
+							class:border-gray-600={letter.text !== ''}
 						>
 							{letter.text}
 						</div>
