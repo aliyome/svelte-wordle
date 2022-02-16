@@ -6,6 +6,15 @@
 	// Maximum numbers of tries
 	const NUM_TRIES = 6;
 
+	// Letter map[a-z]
+	const LETTERS = (() => {
+		const ret: Record<string, boolean> = {};
+		for (let charCode = 97; charCode < 97 + 26; charCode++) {
+			ret[String.fromCharCode(charCode)] = true;
+		}
+		return ret;
+	})();
+
 	interface Try {
 		letters: Letter[];
 	}
@@ -28,6 +37,10 @@
 		// Stores all tries.
 		// One try is one row in the UI.
 		readonly tries: Try[];
+		// Tracks the current try index.
+		currentTryIndex: number;
+		// Tracks the current letter index.
+		currentLetterIndex: number;
 	}
 
 	function createWordle(): Wordle {
@@ -41,12 +54,35 @@
 		}
 
 		return {
-			tries
+			tries,
+			currentTryIndex: 0,
+			currentLetterIndex: 0
 		};
 	}
 	const wordle = createWordle();
+
+	function handleKeydownEvent(e: KeyboardEvent) {
+		handleClickKey(e.key);
+	}
+	function handleClickKey(key: string) {
+		// If key is a letter, update text in the corresponding letter object.
+		if (LETTERS[key.toLowerCase()]) {
+			setLetter(key.toLowerCase());
+			wordle.currentLetterIndex++;
+			if (wordle.currentLetterIndex >= WORD_LENGTH) {
+				// TODO: Need to reimplement this. Automaticaly move to the next try for now.
+				wordle.currentLetterIndex = 0;
+				wordle.currentTryIndex++;
+			}
+		}
+	}
+
+	function setLetter(letter: string) {
+		wordle.tries[wordle.currentTryIndex].letters[wordle.currentLetterIndex].text = letter;
+	}
 </script>
 
+<svelte:window on:keydown={handleKeydownEvent} />
 <div class="w-full h-full flex flex-col items-center">
 	<div
 		class="flex items-center justify-center font-bold text-4xl w-full h-[54px] border-b border-b-gray-300"
@@ -61,7 +97,7 @@
 						<div
 							class="flex items-center justify-center w-[64px] h-[64px] text-[32px] font-bold uppercase border-2 box-border border-gray-300"
 						>
-							{letter.text}L
+							{letter.text}
 						</div>
 					{/each}
 				</div>
