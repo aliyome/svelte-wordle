@@ -267,7 +267,7 @@
 		wordle.tries[wordle.currentTryIndex].shaking = false;
 	}
 
-	async function showInfoMessage(msg: string, hide = false) {
+	async function showInfoMessage(msg: string, hide = true) {
 		isShownMessageSnackbar = true;
 		infoMessage = msg;
 		if (!hide) {
