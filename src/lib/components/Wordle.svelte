@@ -384,6 +384,8 @@
 		class="absolute w-full h-full bg-white/50 flex items-center justify-center transition-opacity duration-100"
 		class:opacity-0={!isShowShareDialog}
 		class:opacity-1={isShowShareDialog}
+		class:invisible={!isShowShareDialog}
+		class:visible={isShowShareDialog}
 	>
 		<div
 			class="w-[300px] h-[300px] bg-white flex items-center justify-center rounded border shadow-xl transition-all duration-300"
