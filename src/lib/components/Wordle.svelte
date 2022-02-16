@@ -114,8 +114,8 @@
 		handleClickKey(e.key);
 	}
 	function handleClickKey(key: string) {
-		// Don't process key down when user has won the game.
-		if (wordle.won) {
+		// Don't process key down when user has won the game or running out of tries.
+		if (wordle.won || wordle.numSubmittedTries >= NUM_TRIES) {
 			return;
 		}
 
@@ -222,6 +222,12 @@
 			// TODO: Display share dialog
 			return;
 		}
+
+		// Running out of tries. Show correct answer.
+		if (wordle.numSubmittedTries >= NUM_TRIES) {
+			showInfoMessage(wordle.targetWord.toUpperCase(), false);
+			// TODO: show share?
+		}
 	}
 
 	async function shakeCurrentRow() {
@@ -230,9 +236,13 @@
 		wordle.tries[wordle.currentTryIndex].shaking = false;
 	}
 
-	async function showInfoMessage(msg: string) {
+	async function showInfoMessage(msg: string, hide = false) {
 		isShownMessageSnackbar = true;
 		infoMessage = msg;
+		if (!hide) {
+			return;
+		}
+
 		// Hide after 2s.
 		await sleep(2000);
 		// When isShownMessageSnackbar is false, the fadeout transition will be played.
