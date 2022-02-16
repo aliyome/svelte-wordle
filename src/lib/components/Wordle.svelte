@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { words } from './words';
+
 	// Util
 	const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -38,6 +40,8 @@
 		// Stores all tries.
 		// One try is one row in the UI.
 		readonly tries: Try[];
+		// Store the target word
+		readonly targetWord: string;
 		// Tracks the number of submitted tries.
 		numSubmittedTries: number;
 		// Tracks the current try index.
@@ -47,6 +51,7 @@
 	}
 
 	function createWordle(): Wordle {
+		// Populate initial state of "tries"
 		const tries: Try[] = [];
 		for (let i = 0; i < NUM_TRIES; i++) {
 			const letters: Letter[] = [];
@@ -56,8 +61,15 @@
 			tries.push({ letters });
 		}
 
+		// Get a target word from the word list.
+		const targetWord = words[Math.floor(Math.random() * words.length)].toLowerCase();
+
+		// TODO: Remove this cheat log
+		console.log('target word: ', targetWord);
+
 		return {
 			tries,
+			targetWord,
 			numSubmittedTries: 0,
 			currentTryIndex: 0,
 			currentLetterIndex: 0
