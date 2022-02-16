@@ -106,6 +106,7 @@
 						<div
 							class="flex items-center justify-center w-[64px] h-[64px] text-[32px] font-bold uppercase border-2 box-border border-gray-300"
 							class:border-gray-600={letter.text !== ''}
+							class:letter-pop-anim={letter.text !== ''}
 						>
 							{letter.text}
 						</div>
@@ -116,3 +117,20 @@
 	</div>
 	<div class="mb-2">Keyboard</div>
 </div>
+
+<style>
+	@keyframes letter-pop {
+		0% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.2);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+	.letter-pop-anim {
+		animation: letter-pop 120ms ease-in-out;
+	}
+</style>
